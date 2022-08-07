@@ -18,7 +18,7 @@ const Layout = ({ title = 'OpenJira', children }: LayoutProps) => {
       <Navbar />
       <Sidebar />
 
-      <Box sx={{ paddingTop: '10px 20px' }}>
+      <Box sx={{ padding: '10px 20px' }}>
         { children }
       </Box>
 
