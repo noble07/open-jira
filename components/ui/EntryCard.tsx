@@ -1,6 +1,7 @@
-import { DragEvent } from 'react'
+import { DragEvent, useContext } from 'react'
 import { Card, CardActionArea, CardActions, CardContent, Typography } from '@mui/material'
 import { Entry } from '../../interfaces'
+import { UIContext } from '../../context/ui'
 
 interface EntryCardProps {
   entry: Entry
@@ -8,14 +9,12 @@ interface EntryCardProps {
 
 const EntryCard = ({ entry }: EntryCardProps) => {
 
+  const { startDragging, endDragging } = useContext(UIContext)
+
   const onDragStart = (e: DragEvent<HTMLDivElement>) => {
     e.dataTransfer.setData('text', entry._id)
-
-    // todo: Modificar el estado, para indentificar que estoy haciendo drag
-  }
-
-  const onDragEnd = () => {
-    // todo: cancelar on drag
+    
+    startDragging()
   }
 
   return (
@@ -24,7 +23,7 @@ const EntryCard = ({ entry }: EntryCardProps) => {
       // Drag events
       draggable
       onDragStart={onDragStart}
-      onDragEnd={onDragEnd}
+      onDragEnd={endDragging}
     >
       <CardActionArea>
         <CardContent>
