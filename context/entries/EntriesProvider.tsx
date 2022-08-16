@@ -50,7 +50,10 @@ export const EntriesProvider = ({ children }: EntriesProviderProps) => {
     }
 
     dispatch({ type: '[Entry] - Add-Entry', payload: newEntry })
+  }
 
+  const updateEntry = (entry: Entry) => {
+    dispatch({ type: '[Entry] - Entry-Updated', payload: entry })
   }
 
   return (
@@ -58,7 +61,8 @@ export const EntriesProvider = ({ children }: EntriesProviderProps) => {
       ...state,
        
       // Methods
-      addNewEntry
+      addNewEntry,
+      updateEntry
     }}>
       {children}
     </EntriesContext.Provider>

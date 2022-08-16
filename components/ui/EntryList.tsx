@@ -14,8 +14,8 @@ interface EntryListProps {
 
 const EntryList = ({ status }: EntryListProps) => {
 
-  const { entries } = useContext(EntriesContext)
-  const { isDragging } = useContext(UIContext)
+  const { entries, updateEntry } = useContext(EntriesContext)
+  const { isDragging, endDragging } = useContext(UIContext)
 
   const entriesByStatus = useMemo(() => entries.filter(entry => entry.status === status),[entries, status])
 
@@ -25,7 +25,11 @@ const EntryList = ({ status }: EntryListProps) => {
 
   const onDropEntry = (e: DragEvent<HTMLDivElement>) => {
     const id = e.dataTransfer.getData('text')
-    console.log({ id })
+
+    const entry = entries.find(e => e._id === id)!
+    entry.status = status
+    updateEntry(entry)
+    endDragging()
   }
 
   return (
