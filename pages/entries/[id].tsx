@@ -1,5 +1,6 @@
-import { ChangeEvent, useMemo, useState } from 'react'
+import { ChangeEvent, useContext, useMemo, useState } from 'react'
 import type { NextPage, GetServerSideProps } from 'next'
+import { useRouter } from 'next/router'
 
 
 import { capitalize, Button, Card, CardActions, CardContent, CardHeader, FormControl, FormControlLabel, FormLabel, Grid, Radio, RadioGroup, TextField, IconButton } from '@mui/material'
@@ -7,6 +8,7 @@ import { capitalize, Button, Card, CardActions, CardContent, CardHeader, FormCon
 import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined'
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined'
 
+import { EntriesContext } from '../../context/entries'
 import { dbEntries } from '../../database'
 import { Layout } from '../../components/layouts'
 import { Entry, EntryStatus } from '../../interfaces'
@@ -19,6 +21,9 @@ interface EntryPageProps {
 }
 
 const EntryPage: NextPage<EntryPageProps> = ({ entry }) => {
+
+  const router = useRouter()
+  const { updateEntry, deleteEntry } = useContext(EntriesContext)
 
   const [inputValue, setInputValue] = useState(entry.description)
   const [status, setStatus] = useState<EntryStatus>(entry.status)
@@ -35,10 +40,20 @@ const EntryPage: NextPage<EntryPageProps> = ({ entry }) => {
   }
 
   const onSave = () => {
-    console.log({
-      inputValue,
-      status
-    })
+    if (inputValue.trim().length === 0) return
+    
+    const updatedEntry: Entry = {
+      ...entry,
+      status,
+      description: inputValue
+    }
+    
+    updateEntry(updatedEntry, true)
+  }
+
+  const onDelete = () => {
+    deleteEntry(entry._id, true)
+    router.replace('/')
   }
   
   return (
@@ -106,12 +121,15 @@ const EntryPage: NextPage<EntryPageProps> = ({ entry }) => {
         </Grid>
       </Grid>
 
-      <IconButton sx={{
-        position: 'fixed',
-        bottom: 30,
-        right: 30,
-        backgroundColor: 'error.dark'
-      }}>
+      <IconButton
+        sx={{
+          position: 'fixed',
+          bottom: 30,
+          right: 30,
+          backgroundColor: 'error.dark'
+        }}
+        onClick={onDelete}
+      >
         <DeleteOutlinedIcon />
       </IconButton>
 

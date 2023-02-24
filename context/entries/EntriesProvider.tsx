@@ -1,5 +1,7 @@
 import { ReactNode, useReducer, useEffect } from 'react'
 
+import { useSnackbar } from 'notistack'
+
 import { entriesApi } from '../../apis'
 import { Entry } from '../../interfaces'
 import { EntriesContext, entriesReducer  } from './'
@@ -19,6 +21,7 @@ const ENTRIES_INITIAL_STATE: EntriesState = {
 export const EntriesProvider = ({ children }: EntriesProviderProps) => {
 
   const [state, dispatch] = useReducer(entriesReducer, ENTRIES_INITIAL_STATE)
+  const { enqueueSnackbar } = useSnackbar();
   
   const addNewEntry = async(description: string) => {
 
@@ -27,13 +30,45 @@ export const EntriesProvider = ({ children }: EntriesProviderProps) => {
 
   }
 
-  const updateEntry = async({ _id, description, status }: Entry) => {
+  const updateEntry = async({ _id, description, status }: Entry, showSnackbar = false) => {
     try {
       const { data } = await entriesApi.put<Entry>(`/entries/${_id}`, { description, status })
+      dispatch({ type: '[Entry] - Entry-Updated', payload: data })
 
-      dispatch({ type: '[Entry] - Entry-Updated', payload: data })      
+      if (showSnackbar)
+        enqueueSnackbar('Entrada actualizada', {
+          variant: 'success',
+          autoHideDuration: 1500,
+          anchorOrigin: {
+            vertical: 'top',
+            horizontal: 'right'
+          }
+
+        })
+      
     } catch (error) {
       console.log({ error })
+    }
+  }
+
+  const deleteEntry = async(_id: string, showSnackbar = false) => {
+    try {
+      const { data } = await entriesApi.delete<Entry>(`/entries/${_id}`)
+      dispatch({ type: '[Entry] - Delete-Entry', payload: data })
+
+      if (showSnackbar)
+        enqueueSnackbar('Entrada eliminada', {
+          variant: 'success',
+          autoHideDuration: 1500,
+          anchorOrigin: {
+            vertical: 'top',
+            horizontal: 'right'
+          }
+
+        })
+      
+    } catch (error) {
+      console.log({error})
     }
   }
 
@@ -53,7 +88,8 @@ export const EntriesProvider = ({ children }: EntriesProviderProps) => {
        
       // Methods
       addNewEntry,
-      updateEntry
+      updateEntry,
+      deleteEntry
     }}>
       {children}
     </EntriesContext.Provider>
